@@ -34,12 +34,56 @@ def main():
 
 # TODO: Create a dictionary to store 14 most recent days of new cases by state
 def calculate(reader):
-    ...
+    reader = list(reader)
+    previous_cases = {}
+    new_cases = {}
+
+    # create initial previous_case dict with cumulative cases
+    for i in range(len(reader)):
+        state = reader[i]["state"]
+        cases = int(reader[i]["cases"])
+        if state not in previous_cases:
+            previous_cases[state] = []
+        previous_cases[state].append(cases)
+
+    # update previous_case dict with daily cases
+    for state in previous_cases:
+        daily_cases = []
+        for i in range(len(previous_cases[state])):
+            if i > 0:
+                daily_cases.append(
+                    previous_cases[state][i] - previous_cases[state][i - 1]
+                )
+            else:
+                daily_cases.append(previous_cases[state][i])
+        previous_cases[state] = daily_cases
+
+    # iterate over previous_cases dict and update the new_cases dict with the last 14 items from the values
+    for state in previous_cases:
+        if len(previous_cases[state]) > 14:
+            new_cases[state] = previous_cases[state][-14:]
+        else:
+            new_cases[state] = previous_cases[state]
+    return new_cases
 
 
 # TODO: Calculate and print out seven day average for given state
 def comparative_averages(new_cases, states):
-    ...
+    for state in states:
+        cases = new_cases[state]
+        previous_week_avrg = sum(cases[:7]) / 7
+        last_week_avrg = sum(cases[7:]) / 7
+        change_percentage = (
+            (last_week_avrg - previous_week_avrg) / previous_week_avrg
+        ) * 100
+        if change_percentage < 0:
+            print(
+                f"{state} had a 7-day average of {int(last_week_avrg)} and a decrease of {abs(int(change_percentage))}%."
+            )
+        if change_percentage >= 0:
+            print(
+                f"{state} had a 7-day average of {int(last_week_avrg)} and an increase of {int(change_percentage)}%."
+            )
 
 
 main()
