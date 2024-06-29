@@ -34,7 +34,7 @@ def main():
 
 # TODO: Create a dictionary to store 14 most recent days of new cases by state
 def calculate(reader):
-    reader = list(reader)
+    reader = list(reader)[::-1]
     previous_cases = {}
     new_cases = {}
 
@@ -44,7 +44,8 @@ def calculate(reader):
         cases = int(reader[i]["cases"])
         if state not in previous_cases:
             previous_cases[state] = []
-        previous_cases[state].append(cases)
+        if len(previous_cases[state]) < 15:
+            previous_cases[state].insert(0, cases)
 
     # update previous_case dict with daily cases
     for state in previous_cases:
